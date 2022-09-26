@@ -30,6 +30,7 @@ class AddImagesPage extends GetView<AddImagesController> {
                 children: [
                   const SizedBox(height: 10.0),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Obx(() => Text(
                             'ID ${controller.image.id}',
