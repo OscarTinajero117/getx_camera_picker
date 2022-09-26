@@ -29,10 +29,16 @@ class AddImagesPage extends GetView<AddImagesController> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const SizedBox(height: 10.0),
-                  Obx(
-                    () => Text(
-                      'ID ${controller.image.id} -  Images: ${controller.image.lengthImgs}',
-                    ),
+                  Row(
+                    children: [
+                      Obx(() => Text(
+                            'ID ${controller.image.id}',
+                          )),
+                      const SizedBox(width: 10.0),
+                      Obx(() => Text(
+                            'Images: ${controller.image.lengthImgs}',
+                          )),
+                    ],
                   ),
                   const SizedBox(height: 10.0),
                   Obx(() => controller.flagPhoto
@@ -67,46 +73,53 @@ class AddImagesPage extends GetView<AddImagesController> {
                             ),
                           )
                         : Expanded(
-                            child: Obx(() => GridView.count(
-                                  crossAxisCount: 2,
-                                  children: List.generate(
-                                    controller.imagesFiles.length,
-                                    (index) {
-                                      String imageModel =
-                                          controller.imagesFiles[index];
-                                      return Stack(
-                                        children: [
-                                          Center(
-                                            child: Container(
-                                              margin: const EdgeInsets.all(10),
-                                              padding: const EdgeInsets.all(10),
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey,
-                                                image: DecorationImage(
-                                                  image: FileImage(
-                                                    File(imageModel),
-                                                    scale: 0.5,
+                            child: Obx(() => controller.reloadPhotos
+                                ? const CircularProgressIndicator.adaptive()
+                                : GridView.count(
+                                    crossAxisCount: 2,
+                                    children: List.generate(
+                                      controller.imagesFiles.length,
+                                      (index) {
+                                        String imagePath =
+                                            controller.imagesFiles[index];
+                                        return Stack(
+                                          children: [
+                                            Center(
+                                              child: Container(
+                                                margin:
+                                                    const EdgeInsets.all(10),
+                                                padding:
+                                                    const EdgeInsets.all(10),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey,
+                                                  image: DecorationImage(
+                                                    image: FileImage(
+                                                      File(imagePath),
+                                                      scale: 0.5,
+                                                    ),
+                                                    fit: BoxFit.cover,
                                                   ),
-                                                  fit: BoxFit.cover,
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
                                                 ),
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
                                               ),
                                             ),
-                                          ),
-                                          _iconImage(
-                                            Alignment.topRight,
-                                            Icons
-                                                .indeterminate_check_box_rounded,
-                                            iconColor: Colors.red,
-                                            onPressed: () {},
-                                            size: 30,
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  ),
-                                )),
+                                            _iconImage(
+                                              Alignment.topRight,
+                                              Icons
+                                                  .indeterminate_check_box_rounded,
+                                              iconColor: Colors.red,
+                                              onPressed: () {
+                                                controller
+                                                    .deletePhoto(imagePath);
+                                              },
+                                              size: 30,
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                  )),
                           ),
                   ),
                 ],
@@ -118,7 +131,7 @@ class AddImagesPage extends GetView<AddImagesController> {
   Widget _iconImage(
     AlignmentGeometry alignment,
     IconData icon, {
-    Function? onPressed,
+    VoidCallback? onPressed,
     Color iconColor = Colors.white,
     double size = 24,
   }) {

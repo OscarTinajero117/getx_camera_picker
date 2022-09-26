@@ -22,19 +22,35 @@ class AddImagesController extends GetxController {
   RxBool _flagPhoto = false.obs;
   bool get flagPhoto => _flagPhoto.value;
 
+  RxBool _reloadPhotos = false.obs;
+  bool get reloadPhotos => _reloadPhotos.value;
+
   //ruta del archivo
   late Directory _rutaImg;
+
+  Future<void> deletePhoto(String path) async {
+    _reloadPhotos.value = true;
+
+    final file = File(path);
+    try {
+      await file.delete();
+      await _giveList();
+    } catch (e) {
+      log(e.toString());
+    } finally {
+      _reloadPhotos.value = false;
+    }
+  }
 
   Future<void> takePhoto() async {
     _flagPhoto.value = true;
     try {
-      // final picker = ImagePicker();
       final file = await ImagePicker().pickImage(
         source: ImageSource.camera,
       );
       if (file != null) {
-        // TODO: Add Image
         await _addImage(file);
+        await _giveList();
       }
     } catch (e) {
       log(e.toString());
@@ -59,33 +75,51 @@ class AddImagesController extends GetxController {
   }
 
   Future<void> _giveList() async {
-    int index = 0;
     final tmpList = _reviewList();
     _imagesFiles.value = tmpList;
     _image.value.lengthImgs = tmpList.isEmpty ? 0 : tmpList.length;
-    await _image.value.save();
+    await image.save();
   }
+
+  int _giveLastID(List<String> list) {
+    /// lista de enteros
+    List<int> tmpList = [];
+
+    /// Se recorre la lista de Strings
+    for (String row in list) {
+      /// Se separá la lista por '-'
+      final rowSplit1 = row.split('-');
+
+      /// Se separá la lista por '.'
+      final rowSplit2 = (rowSplit1[1].split('.'));
+
+      /// Se obtiene el ID
+      final id = int.parse(rowSplit2[0]);
+
+      /// Se agrega a la lista de enteros
+      tmpList.add(id);
+    }
+    log(tmpList.toString());
+
+    /// Se acomoda la lista
+    tmpList.sort();
+    log(tmpList.toString());
+
+    /// Se retorna el último valor de la lista
+    return tmpList[tmpList.length - 1];
+  }
+
+  // void _list
 
   Future<void> _addImage(XFile imageToSave) async {
     int idFile = 1;
     final tmpList = _reviewList();
     if (tmpList.isNotEmpty) {
-      //Obtener el ultimo elemento
-      final tmpItem = (tmpList[tmpList.length - 1]).split('-');
-      //obtener el nombre
-      // final tmpRoute = tmpItem.split('-');
-      final tmpName = (tmpItem[1]).split('.');
-      //obtener el id de la imagen
-      // final tmpID = tmpName.split('.');
-      final lastId = int.parse(tmpName[0]);
+      //Se obtiene el último id
+      final lastId = _giveLastID(tmpList);
       //guardar en idFile
-      idFile = lastId;
+      idFile = lastId + 1;
     }
-
-    // _imagesFiles.value.isEmpty
-    //     ? idFile = 1
-    //     : idFile = _imagesFiles.value.length + 1;
-
     //Nombre del archivo
     final nombreImg = "${image.id}-$idFile";
     //ruta en texto del archivo
@@ -93,8 +127,6 @@ class AddImagesController extends GetxController {
     log(rutaImgTxt);
 
     await imageToSave.saveTo(rutaImgTxt);
-
-    await _giveList();
   }
 
   Future<void> _makeDirectory() async {

@@ -30,27 +30,27 @@ class HomePage extends GetView<HomeController> {
                     const SizedBox(height: 10.0),
                     const Text('Add Images'),
                     const SizedBox(height: 10.0),
-                    RoundedButton(
-                      text:
-                          'ID ${controller.images[0].id} - ${controller.images[0].lengthImgs}',
-                      onPressed: () {
-                        controller.toAddImages(controller.images[0]);
-                      },
-                    ),
-                    RoundedButton(
-                      text:
-                          'ID ${controller.images[1].id} - ${controller.images[1].lengthImgs}',
-                      onPressed: () {
-                        controller.toAddImages(controller.images[1]);
-                      },
-                    ),
-                    RoundedButton(
-                      text:
-                          'ID ${controller.images[2].id} - ${controller.images[2].lengthImgs}',
-                      onPressed: () {
-                        controller.toAddImages(controller.images[2]);
-                      },
-                    ),
+                    Obx(() => RoundedButton(
+                          text:
+                              'ID ${controller.images[0].id} - ${controller.images[0].lengthImgs}',
+                          onPressed: () {
+                            controller.toAddImages(controller.images[0]);
+                          },
+                        )),
+                    Obx(() => RoundedButton(
+                          text:
+                              'ID ${controller.images[1].id} - ${controller.images[1].lengthImgs}',
+                          onPressed: () {
+                            controller.toAddImages(controller.images[1]);
+                          },
+                        )),
+                    Obx(() => RoundedButton(
+                          text:
+                              'ID ${controller.images[2].id} - ${controller.images[2].lengthImgs}',
+                          onPressed: () {
+                            controller.toAddImages(controller.images[2]);
+                          },
+                        )),
                   ],
                 ),
               ),
