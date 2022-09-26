@@ -129,20 +129,12 @@ class AddImagesController extends GetxController {
     await imageToSave.saveTo(rutaImgTxt);
   }
 
-  Future<void> _makeDirectory() async {
-    //*** Comprobar directorio imagenes
-    final tmpPath = await getApplicationDocumentsDirectory();
-    _rutaImg = Directory("${tmpPath.path}/Imagenes");
-    if (!await _rutaImg.exists()) {
-      await _rutaImg.create();
-    }
-  }
-
   @override
   void onInit() async {
     _loading.value = true;
     _image.value = Get.arguments;
-    await _makeDirectory();
+    final tmpPath = await getApplicationDocumentsDirectory();
+    _rutaImg = Directory("${tmpPath.path}/Imagenes");
     await _giveList();
     _loading.value = false;
     super.onInit();

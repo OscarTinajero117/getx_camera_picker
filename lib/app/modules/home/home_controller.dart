@@ -1,6 +1,10 @@
 // ignore_for_file: prefer_final_fields, invalid_use_of_protected_member
 
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:get/get.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../data/models/id_images.dart';
 import '../../data/providers/local/boxes.dart';
@@ -10,12 +14,50 @@ class HomeController extends GetxController {
   RxList<IdImages> _images = <IdImages>[].obs;
   List<IdImages> get images => _images.value;
 
+  RxList<String> _imagesFiles = <String>[].obs;
+  List<String> get imagesFiles => _imagesFiles.value;
+
   RxBool _loading = true.obs;
   bool get loading => _loading.value;
 
   void _getImages() {
     final box = Boxes.getIdImages();
     _images.value = box.values.toList();
+  }
+
+  Future<void> _giveAllImages() async {
+    final rutaImg = await _makeDirectory();
+    List<String> tmpList = [];
+    //use your folder name insted of resume.
+    final file = rutaImg.listSync();
+    if (file.isNotEmpty) {
+      for (FileSystemEntity row in file) {
+        tmpList.add(row.path);
+        log(row.path);
+      }
+    }
+    _imagesFiles.value = tmpList;
+  }
+
+  List<String> allImagesFromID(String id) {
+    List<String> tmpList = [];
+    for (String row in imagesFiles) {
+      if (row.contains(id)) {
+        tmpList.add(row);
+        log(row);
+      }
+    }
+    return tmpList;
+  }
+
+  Future<Directory> _makeDirectory() async {
+    //*** Comprobar directorio imagenes
+    final tmpPath = await getApplicationDocumentsDirectory();
+    final rutaImg = Directory("${tmpPath.path}/Imagenes");
+    if (!await rutaImg.exists()) {
+      await rutaImg.create();
+    }
+    return rutaImg;
   }
 
   void _init() {
@@ -46,21 +88,14 @@ class HomeController extends GetxController {
   }
 
   @override
-  void onInit() {
+  void onInit() async {
     _loading.value = true;
     _getImages();
     if (images.isEmpty) {
       _init();
     }
+    await _giveAllImages();
     _loading.value = false;
     super.onInit();
   }
-
-  // @override
-  // void onClose() {
-  //   ///Close connection hive
-  //   // Hive.close(); //Close all
-  //   // Hive.box('id_images').close(); //Close only one
-  //   super.onClose();
-  // }
 }
