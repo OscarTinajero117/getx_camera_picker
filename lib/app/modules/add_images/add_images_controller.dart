@@ -109,8 +109,6 @@ class AddImagesController extends GetxController {
     return tmpList[tmpList.length - 1];
   }
 
-  // void _list
-
   Future<void> _addImage(XFile imageToSave) async {
     int idFile = 1;
     final tmpList = _reviewList();
